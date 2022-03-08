@@ -1,34 +1,21 @@
-import os
+
 import sys
 import time
 import logging
 import requests
 from http import HTTPStatus
-from dotenv import load_dotenv
 
 from telegram import Bot
 
+from config import (
+    PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
+    RETRY_TIME, ENDPOINT, HEADERS, HOMEWORK_STATUSES
+)
 from exceptions import (
     error_message, new_status, EndpointUrl, HomeworkNewStatus,
     DictIsNotEmpty, ResponseNotList
 )
 
-load_dotenv()
-
-PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
-
-RETRY_TIME = 600
-
-ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
-
-HOMEWORK_STATUSES = {
-    'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
-    'reviewing': 'Работа взята на проверку ревьюером.',
-    'rejected': 'Работа проверена: у ревьюера есть замечания.'
-}
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -38,6 +25,10 @@ formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 handler.setFormatter(formatter)
+
+# не нашёл как применить валидацию в датакласс, все примеры примитивные,
+#  да и думаю для меня это всё сложно пока,
+# разобраться бы с тем что в теории даётся.
 
 
 def send_message(bot, message):
@@ -130,8 +121,7 @@ def check_tokens():
             ' Программа принудительно остановлена.'
         )
         return False
-    else:
-        return True
+    return True
 
 
 def main():
@@ -140,7 +130,7 @@ def main():
     while tokens is True:
         try:
             bot = Bot(token=TELEGRAM_TOKEN)
-            current_timestamp = int(time.time())
+            current_timestamp = 0  # int(time.time())
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
             if homeworks != []:
