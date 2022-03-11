@@ -26,10 +26,6 @@ formatter = logging.Formatter(
 )
 handler.setFormatter(formatter)
 
-# не нашёл как применить валидацию в датакласс, все примеры примитивные,
-#  да и думаю для меня это всё сложно пока,
-# разобраться бы с тем что в теории даётся.
-
 
 def send_message(bot, message):
     """Функция делает запрос отправляет сообщение в Telegram чат."""
@@ -38,7 +34,7 @@ def send_message(bot, message):
     except Exception as error:
         logging.error(f'Сбой при отправке сообщения: {error}', exc_info=True)
     else:
-        logger.info('Сообщение отправлено')
+        logger.info(f'Сообщение отправлено: {message}')
 
 
 def get_api_answer(current_timestamp):
@@ -93,7 +89,7 @@ def parse_status(homework):
         new_status(homework_status)
         return f'Изменился статус проверки работы "{homework_name}". {verdict}'
     except HomeworkNewStatus:
-        print('Ожидание нового статуса проверки')
+        print('Ожидание нового статуса проверки работы')
         return None
 
 
@@ -130,7 +126,7 @@ def main():
     while tokens is True:
         try:
             bot = Bot(token=TELEGRAM_TOKEN)
-            current_timestamp = 0  # int(time.time())
+            current_timestamp = int(time.time())
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
             if homeworks != []:
