@@ -62,10 +62,12 @@ def check_response(response):
     И если ответ API соответствует ожиданиям,
     возвращает список домашних работ.
     """
-    mybool = type(response['homeworks']) is list
-    if response == {}:
+    response_is_list = type(response['homeworks']) is list  # если сделать с
+    # методом .get(), то при прохождение pytest появляется ошибка:
+    #  AttributeError: 'list' object has no attribute 'get'
+    if {} is False:
         raise DictIsNotEmpty('Ответ от API содержит пустой словарь')
-    if mybool is False:
+    if response_is_list is False:
         raise ResponseNotList(
             'Под ключом "homeworks",'
             'домашки приходят не в виде списка'
@@ -98,19 +100,19 @@ def check_tokens():
     Проверка доступности переменных окружения.
     Которые необходимы для работы программы.
     """
-    if PRACTICUM_TOKEN is None or PRACTICUM_TOKEN is str(''):
+    if PRACTICUM_TOKEN is None or str('') is False:
         logging.critical(
             'Отсутствует обязательная переменная окружения: "PRACTICUM_TOKEN".'
             ' Программа принудительно остановлена.'
         )
         return False
-    elif TELEGRAM_TOKEN is None or TELEGRAM_TOKEN is str(''):
+    elif TELEGRAM_TOKEN is None or str('') is False:
         logging.critical(
             'Отсутствует обязательная переменная окружения: "TELEGRAM_TOKEN".'
             ' Программа принудительно остановлена.'
         )
         return False
-    elif TELEGRAM_CHAT_ID is None or TELEGRAM_CHAT_ID is str(''):
+    elif TELEGRAM_CHAT_ID is None or str('') is False:
         logging.critical(
             'Отсутствует обязательная переменная окружения: '
             '"TELEGRAM_CHAT_ID".'
@@ -126,7 +128,7 @@ def main():
     while tokens is True:
         try:
             bot = Bot(token=TELEGRAM_TOKEN)
-            current_timestamp = int(time.time())
+            current_timestamp = 0  # int(time.time())
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
             if homeworks != []:
