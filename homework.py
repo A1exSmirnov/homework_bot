@@ -62,17 +62,16 @@ def check_response(response):
     И если ответ API соответствует ожиданиям,
     возвращает список домашних работ.
     """
-    response_is_list = type(response['homeworks']) is list  # если сделать с
-    # методом .get(), то при прохождение pytest появляется ошибка:
-    #  AttributeError: 'list' object has no attribute 'get'
-    if {} is False:
+    if type(response) is not dict:
+        raise TypeError('Ответ от API имеет некорректный тип')
+    if not response:
         raise DictIsNotEmpty('Ответ от API содержит пустой словарь')
-    if response_is_list is False:
+    homeworks = response.get('homeworks')
+    if type(homeworks) is not list:
         raise ResponseNotList(
             'Под ключом "homeworks",'
             'домашки приходят не в виде списка'
         )
-    homeworks = response.get('homeworks')
     return homeworks
 
 
@@ -100,19 +99,19 @@ def check_tokens():
     Проверка доступности переменных окружения.
     Которые необходимы для работы программы.
     """
-    if PRACTICUM_TOKEN is None or str('') is False:
+    if PRACTICUM_TOKEN is None or not PRACTICUM_TOKEN:
         logging.critical(
             'Отсутствует обязательная переменная окружения: "PRACTICUM_TOKEN".'
             ' Программа принудительно остановлена.'
         )
         return False
-    elif TELEGRAM_TOKEN is None or str('') is False:
+    elif TELEGRAM_TOKEN is None or not TELEGRAM_TOKEN:
         logging.critical(
             'Отсутствует обязательная переменная окружения: "TELEGRAM_TOKEN".'
             ' Программа принудительно остановлена.'
         )
         return False
-    elif TELEGRAM_CHAT_ID is None or str('') is False:
+    elif TELEGRAM_CHAT_ID is None or not TELEGRAM_CHAT_ID:
         logging.critical(
             'Отсутствует обязательная переменная окружения: '
             '"TELEGRAM_CHAT_ID".'
